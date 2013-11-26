@@ -3,12 +3,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class WordNet {
+	// holds noun and synsets it appears in
 	private final HashMap<String, ArrayList<Integer>> dict;
 	private final Digraph G;
 	private final SAP sap;
+	// synset list
 	private final ArrayList<String> synset;
-	// constructor takes the name of the two input files
 	
+	// constructor takes the name of the two input files
 	public WordNet(String synsets, String hypernyms) {
 		dict = new HashMap<String, ArrayList<Integer>>();
 		synset = new ArrayList<String>();
@@ -17,10 +19,13 @@ public class WordNet {
 		In inSyn = new In(synsets);
 		int count = 0;
 		while(inSyn.hasNextLine()) {
+			// use "," to separate fields
 			String[] fields = inSyn.readLine().split(",");
+			// id,synset,description
 			int id = Integer.parseInt(fields[0]);
 			synset.add(fields[1]);
 			String[] nouns = fields[1].split(" ");
+			// collect distinct nouns
 			for (String noun : nouns) {
 				if (!dict.containsKey(noun))
 					dict.put(noun,  new ArrayList<Integer>());
@@ -38,19 +43,22 @@ public class WordNet {
 		while(inHyper.hasNextLine()) {
 			String[] vertices = inHyper.readLine().split(",");
 			int v = Integer.parseInt(vertices[0]);
-			if (vertices.length > 1) marked[v] = true; // with outgoing edge
+			// mark nodes with outgoing edge
+			if (vertices.length > 1) marked[v] = true;
 			for (int i = 1; i < vertices.length; i++) 
 				G.addEdge(v, Integer.parseInt(vertices[i]));
 		}
-        DirectedCycle finder = new DirectedCycle(G);
-        
+		
+        DirectedCycle finder = new DirectedCycle(G);        
         int numRoots = 0;
         for(int i = 0; i < marked.length; i++) 
         	if (marked[i] == false) numRoots++;
+        
+        // has cycle or multiple root
         if (finder.hasCycle() || numRoots != 1)
         	throw new java.lang.IllegalArgumentException();
-		inHyper.close();
-		
+        
+		inHyper.close();		
 		sap = new SAP(G);
 	}
 
