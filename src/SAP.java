@@ -1,8 +1,8 @@
 
-public class SAP {
+public final class SAP {
 	// constructor takes a digraph (not necessarily a DAG)
-	private Digraph G;
-	private int V;
+	private final Digraph G;
+	private final int V;
 	public SAP(Digraph G) {
 		this.G = G;
 		this.V = G.V();

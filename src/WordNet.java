@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class WordNet {
-	private HashMap<String, ArrayList<Integer>> dict;
-	private Digraph G;
-	private ArrayList<String> synset;
+public final class WordNet {
+	private final HashMap<String, ArrayList<Integer>> dict;
+	private final Digraph G;
+	private final ArrayList<String> synset;
 	// constructor takes the name of the two input files
 	
 	public WordNet(String synsets, String hypernyms) {
@@ -38,7 +38,8 @@ public class WordNet {
 				G.addEdge(v, Integer.parseInt(vertices[i]));
 		}
         DirectedCycle finder = new DirectedCycle(G);
-        if (finder.hasCycle())
+        TarjanSCC scc = new TarjanSCC(G);
+        if (finder.hasCycle() || scc.count() != 1)
         	throw new java.lang.IllegalArgumentException();
 		inHyper.close();
 	}
