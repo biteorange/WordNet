@@ -37,6 +37,9 @@ public class WordNet {
 			for (int i = 1; i < vertices.length; i++) 
 				G.addEdge(v, Integer.parseInt(vertices[i]));
 		}
+        DirectedCycle finder = new DirectedCycle(G);
+        if (finder.hasCycle())
+        	throw new java.lang.IllegalArgumentException();
 		inHyper.close();
 	}
 
@@ -52,6 +55,8 @@ public class WordNet {
 
 	// distance between nounA and nounB (defined below)
 	public int distance(String nounA, String nounB) {
+		if (!dict.containsKey(nounA) || !dict.containsKey(nounB))
+			throw new java.lang.IllegalArgumentException();
 		SAP sap = new SAP(G);
 		return sap.length(dict.get(nounA), dict.get(nounB));
 	}
@@ -59,6 +64,8 @@ public class WordNet {
 	// a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
 	// in a shortest ancestral path (defined below)
 	public String sap(String nounA, String nounB) {
+		if (!dict.containsKey(nounA) || !dict.containsKey(nounB))
+			throw new java.lang.IllegalArgumentException();
 		SAP sap = new SAP(G);
 		int id = sap.ancestor(dict.get(nounA),  dict.get(nounB));
 		return synset.get(id);

@@ -22,6 +22,7 @@ public class Outcast {
 		return out;
 	}
 
+	// unit test client
 	public static void main(String[] args) {
 	    WordNet wordnet = new WordNet(args[0], args[1]);
 	    Outcast outcast = new Outcast(wordnet);
