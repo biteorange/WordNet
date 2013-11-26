@@ -1,11 +1,12 @@
 
-public final class SAP {
+public class SAP {
 	// constructor takes a digraph (not necessarily a DAG)
 	private final Digraph G;
 	private final int V;
 	public SAP(Digraph G) {
-		this.G = G;
-		this.V = G.V();
+		// immutable
+		this.G = new Digraph(G);
+		this.V = this.G.V();
 	}
 
 	// length of shortest ancestral path between v and w; -1 if no such path

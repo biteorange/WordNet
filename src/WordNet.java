@@ -1,9 +1,11 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
-public final class WordNet {
+public class WordNet {
 	private final HashMap<String, ArrayList<Integer>> dict;
 	private final Digraph G;
+	private final SAP sap;
 	private final ArrayList<String> synset;
 	// constructor takes the name of the two input files
 	
@@ -29,19 +31,27 @@ public final class WordNet {
 		inSyn.close();
 		
 		// build the graph
+		boolean marked[] = new boolean[count];
+		Arrays.fill(marked, false);
 		G = new Digraph(count);
 		In inHyper = new In(hypernyms);
 		while(inHyper.hasNextLine()) {
 			String[] vertices = inHyper.readLine().split(",");
 			int v = Integer.parseInt(vertices[0]);
+			if (vertices.length > 1) marked[v] = true; // with outgoing edge
 			for (int i = 1; i < vertices.length; i++) 
 				G.addEdge(v, Integer.parseInt(vertices[i]));
 		}
         DirectedCycle finder = new DirectedCycle(G);
-        TarjanSCC scc = new TarjanSCC(G);
-        if (finder.hasCycle() || scc.count() != 1)
+        
+        int numRoots = 0;
+        for(int i = 0; i < marked.length; i++) 
+        	if (marked[i] == false) numRoots++;
+        if (finder.hasCycle() || numRoots != 1)
         	throw new java.lang.IllegalArgumentException();
 		inHyper.close();
+		
+		sap = new SAP(G);
 	}
 
 	// the set of nouns (no duplicates), returned as an Iterable
@@ -58,7 +68,7 @@ public final class WordNet {
 	public int distance(String nounA, String nounB) {
 		if (!dict.containsKey(nounA) || !dict.containsKey(nounB))
 			throw new java.lang.IllegalArgumentException();
-		SAP sap = new SAP(G);
+		
 		return sap.length(dict.get(nounA), dict.get(nounB));
 	}
 
@@ -67,7 +77,7 @@ public final class WordNet {
 	public String sap(String nounA, String nounB) {
 		if (!dict.containsKey(nounA) || !dict.containsKey(nounB))
 			throw new java.lang.IllegalArgumentException();
-		SAP sap = new SAP(G);
+		
 		int id = sap.ancestor(dict.get(nounA),  dict.get(nounB));
 		return synset.get(id);
 	}
